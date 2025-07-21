@@ -1,9 +1,14 @@
 import { usePage } from "@inertiajs/react";
 import axios from "axios";
-import { Camera, Home, Search, Settings, Sparkles, User, LogOut } from "lucide-react";
+import {
+    Home,
+    LogOut,
+    Paintbrush,
+    Settings,
+    Sparkles,
+    User,
+} from "lucide-react";
 import { useEffect, useState } from "react";
-
-
 
 const Sidebar = () => {
     const { url } = usePage();
@@ -17,7 +22,7 @@ const Sidebar = () => {
             "": "feed",
             feed: "feed",
             explore: "explore",
-            create: "create",
+            "art-board": "artboard",
             "ai-generate": "ai",
             ai: "ai",
             profile: "profile",
@@ -40,15 +45,19 @@ const Sidebar = () => {
                     <div className="space-y-2">
                         {[
                             { icon: Home, label: "feed", key: "feed" },
-                            { icon: Search, label: "explore", key: "explore" },
-                            { icon: Camera, label: "create", key: "create" },
+                            {
+                                icon: Paintbrush,
+                                label: "art-board",
+                                key: "artboard",
+                            },
                             { icon: Sparkles, label: "ai-generate", key: "ai" },
                             { icon: User, label: "profile", key: "profile" },
                             {
                                 icon: Settings,
                                 label: "Settings",
                                 key: "settings",
-                            },{
+                            },
+                            {
                                 icon: LogOut,
                                 label: "Logout",
                                 key: "logout",
@@ -58,31 +67,43 @@ const Sidebar = () => {
                                 key={key}
                                 onClick={async () => {
                                     if (key === "logout") {
-                                            const token = localStorage.getItem("token"); // or "auth_token", depending on how you stored it
+                                        const token =
+                                            localStorage.getItem("token"); // or "auth_token", depending on how you stored it
 
-                                            if (!token) {
-                                                console.error("No token found in localStorage");
-                                                return;
-                                            }
-
-                                            try {
-                                                await axios.post("/api/logout", {}, {
-                                                    headers: {
-                                                        "Content-Type": "application/json",
-                                                        "Accept": "application/json",
-                                                        "X-Requested-With": "XMLHttpRequest",
-                                                        "Authorization": `Bearer ${token}`,
-                                                    },
-                                                });
-
-                                                // Optional: Remove token and redirect user
-                                                localStorage.removeItem("token");
-                                                window.location.href = "/login"; // or router.push if using React Router / Inertia
-                                                return
-                                            } catch (error) {
-                                                console.error("Logout failed", error);
-                                            }
+                                        if (!token) {
+                                            console.error(
+                                                "No token found in localStorage"
+                                            );
+                                            return;
                                         }
+
+                                        try {
+                                            await axios.post(
+                                                "/api/logout",
+                                                {},
+                                                {
+                                                    headers: {
+                                                        "Content-Type":
+                                                            "application/json",
+                                                        Accept: "application/json",
+                                                        "X-Requested-With":
+                                                            "XMLHttpRequest",
+                                                        Authorization: `Bearer ${token}`,
+                                                    },
+                                                }
+                                            );
+
+                                            // Optional: Remove token and redirect user
+                                            localStorage.removeItem("token");
+                                            window.location.href = "/login"; // or router.push if using React Router / Inertia
+                                            return;
+                                        } catch (error) {
+                                            console.error(
+                                                "Logout failed",
+                                                error
+                                            );
+                                        }
+                                    }
 
                                     setActiveTab(key);
                                     window.location.href = `/${label}`;
@@ -97,31 +118,6 @@ const Sidebar = () => {
                                 <span className="font-medium">{label}</span>
                             </button>
                         ))}
-                    </div>
-
-                    <div className="border-t border-pink-100 pt-6">
-                        <h3 className="text-sm font-semibold text-pink-800 mb-3">
-                            Suggested Artists
-                        </h3>
-                        <div className="space-y-3">
-                            {[
-                                "🌸 Rose Garden",
-                                "🦋 Butterfly Dreams",
-                                "🌙 Lunar Art",
-                            ].map((artist, i) => (
-                                <div
-                                    key={i}
-                                    className="flex items-center space-x-3"
-                                >
-                                    <div className="w-8 h-8 bg-gradient-to-r from-pink-300 to-purple-300 rounded-full flex items-center justify-center text-white text-sm">
-                                        {artist.split(" ")[0]}
-                                    </div>
-                                    <span className="text-sm text-pink-700">
-                                        {artist.split(" ").slice(1).join(" ")}
-                                    </span>
-                                </div>
-                            ))}
-                        </div>
                     </div>
                 </div>
             </div>

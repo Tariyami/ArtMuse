@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 
-Route::get('/login',[GeneralController::class,'renderLogin']);
+Route::get('/login',[GeneralController::class,'renderLogin'])->name('login');
 
 Route::get('/register',[GeneralController::class,'renderRegister']);
 

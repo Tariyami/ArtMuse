@@ -7,7 +7,7 @@ use App\Http\Controllers\PostController;
 use App\Http\Controllers\SettingsController;
 
 Route::get('/user', function (Request $request) {
-    return $request->user();
+  return $request->user()->load('posts');
 })->middleware('auth:sanctum');
 
 Route::post('/register', [AuthController::class, 'register']);
@@ -24,7 +24,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 });
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware('auth:sanctum')->group(function () {
     Route::get('/Settings', [SettingsController::class, 'index'])->name('settings.index');
-    Route::put('/Settings', [SettingsController::class, 'update'])->name('settings.update');
+    Route::put('/update', [SettingsController::class, 'update'])->name('settings.update');
+
+    Route::delete('/delete', [SettingsController::class,'destroy'])->name(name: 'settings.delete');
 });

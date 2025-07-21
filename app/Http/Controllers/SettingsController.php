@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Exceptions\Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
@@ -26,13 +29,14 @@ class SettingsController extends Controller
      * Update the user's profile information.
      */
     public function update(Request $request)
-    {
+{
+    try {
         // Check if user is authenticated
-        if (!\Illuminate\Support\Facades\Auth::check()) {
-            return redirect()->route('login')->with('error', 'Please login to access settings.');
+        if (!Auth::check()) {
+          return response()->json(['message' => 'Unauthenticated'], 403);
         }
 
-        $user = \Illuminate\Support\Facades\Auth::user();
+        $user = request()->user();
 
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -44,7 +48,7 @@ class SettingsController extends Controller
         // Verify current password if new password is provided
         if ($request->filled('password')) {
             if (!Hash::check($request->current_password, $user->password)) {
-                return back()->withErrors(['current_password' => 'The current password is incorrect.']);
+              return response()->json(['message' => 'The password was incorrect.'], 401);
             }
         }
 
@@ -59,6 +63,21 @@ class SettingsController extends Controller
 
         $user->save();
 
-        return back()->with('success', 'Settings updated successfully!');
+        return response()->json(['message' => 'Profile updated successfully.'], 200);
+    } catch (Exception $e) {
+        // Log the actual error for debugging
+        Log::error('Settings update error: '.$e->getMessage());
+
+        // Return with a user-friendly error
+        return back()->with('error', 'Something went wrong while updating your settings. Please try again.');
     }
+}
+    public function destroy(Request $request)
+    {
+      $user = $request->user(); // Authenticated user
+
+      $user->delete();
+
+      return response()->json(['message' => 'Account deleted successfully'], 200);
+  }
 }
